@@ -1,0 +1,125 @@
+{
+  "company": "Gulf Coast Energy Partners",
+  "export_date": "2025-01-22",
+  "inspections": [
+    {
+      "id": "INS-2025-018",
+      "location": "Platform 7",
+      "type": "Incident Investigation",
+      "date": "2025-01-10",
+      "inspector": "OSHA Region 6",
+      "status": "open",
+      "summary": "Contractor fall through corroded grating. Investigation ongoing.",
+      "findings": [
+        {
+          "severity": "critical",
+          "description": "Grating inspection records from 2023 not located",
+          "osha_ref": "1910.22(b)"
+        },
+        {
+          "severity": "high",
+          "description": "Contractor safety orientation documentation incomplete",
+          "osha_ref": "1910.1200(h)"
+        }
+      ]
+    },
+    {
+      "id": "INS-2025-012",
+      "location": "Platform 3",
+      "type": "Monthly Safety Walkthrough",
+      "date": "2025-01-08",
+      "inspector": "Mike Thibodaux",
+      "status": "pass",
+      "summary": "No issues identified.",
+      "findings": []
+    },
+    {
+      "id": "INS-2025-006",
+      "location": "Fourchon Processing",
+      "type": "PSM Audit",
+      "date": "2025-01-05",
+      "inspector": "External - Process Safety Corp",
+      "status": "fail",
+      "summary": "Annual process safety management review.",
+      "findings": [
+        {
+          "severity": "high",
+          "description": "P&IDs for compressor unit not updated after 2024 modification",
+          "osha_ref": "1910.119(d)(3)"
+        },
+        {
+          "severity": "medium",
+          "description": "3 operators missing annual refresher training",
+          "osha_ref": "1910.119(g)(2)"
+        }
+      ]
+    },
+    {
+      "id": "INS-2024-287",
+      "location": "Platform 7",
+      "type": "Structural Integrity Check",
+      "date": "2024-12-15",
+      "inspector": "Dave Landry",
+      "status": "pass",
+      "summary": "Quarterly structural inspection completed.",
+      "findings": []
+    },
+    {
+      "id": "INS-2024-265",
+      "location": "Platform 12",
+      "type": "Monthly Safety Walkthrough",
+      "date": "2024-12-10",
+      "inspector": "Mike Thibodaux",
+      "status": "fail",
+      "summary": "PPE violations observed during shift change.",
+      "findings": [
+        {
+          "severity": "medium",
+          "description": "2 workers without safety glasses in designated area",
+          "osha_ref": "1910.133(a)(1)"
+        }
+      ]
+    },
+    {
+      "id": "INS-2024-251",
+      "location": "Morgan City Terminal",
+      "type": "Fire Suppression Test",
+      "date": "2024-12-01",
+      "inspector": "External - Acadian Fire",
+      "status": "pass",
+      "summary": "Annual fire system certification completed.",
+      "findings": []
+    },
+    {
+      "id": "INS-2024-234",
+      "location": "Platform 3",
+      "type": "Confined Space Entry Audit",
+      "date": "2024-11-20",
+      "inspector": "Rachel Mouton",
+      "status": "fail",
+      "summary": "Permit and atmospheric monitoring issues.",
+      "findings": [
+        {
+          "severity": "critical",
+          "description": "Entry permit expired during active tank work",
+          "osha_ref": "1910.146(e)(5)"
+        },
+        {
+          "severity": "high",
+          "description": "Gas monitor calibration 2 weeks overdue",
+          "osha_ref": "1910.146(c)(5)"
+        }
+      ]
+    },
+    {
+      "id": "INS-2024-218",
+      "location": "Fourchon Processing",
+      "type": "Monthly Safety Walkthrough",
+      "date": "2024-11-12",
+      "inspector": "Rachel Mouton",
+      "status": "pass",
+      "summary": "Routine inspection. Minor housekeeping items addressed on-site.",
+      "findings": []
+    }
+  ]
+}
