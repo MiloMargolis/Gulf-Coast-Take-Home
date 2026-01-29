@@ -8,21 +8,25 @@ export default {
     extend: {
       colors: {
         'interface': {
-          'bg': '#f8fafc',
-          'sidebar': '#ffffff',
+          'bg': '#f9fafb',
           'card': '#ffffff',
-          'border': '#e2e8f0',
-          'border-light': '#f1f5f9',
-          'accent': '#3b82f6',
-          'accent-hover': '#2563eb',
-          'text': '#1e293b',
-          'text-secondary': '#64748b',
-          'text-muted': '#94a3b8',
+          'border': '#e5e7eb',
+          'border-light': '#f3f4f6',
+          'accent': '#2563eb',
+          'accent-light': '#eff6ff',
+          'accent-hover': '#1d4ed8',
+          'green': '#16a34a',
+          'green-hover': '#15803d',
+          'slate': '#475569',
+          'slate-hover': '#334155',
+          'text': '#111827',
+          'text-secondary': '#6b7280',
+          'text-muted': '#9ca3af',
         }
       },
       boxShadow: {
-        'card': '0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05)',
-        'card-hover': '0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05)',
+        'card': '0 1px 2px 0 rgb(0 0 0 / 0.03)',
+        'card-hover': '0 1px 3px 0 rgb(0 0 0 / 0.05)',
       }
     },
   },
