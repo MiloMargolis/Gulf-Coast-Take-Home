@@ -1,4 +1,17 @@
-export default function InspectionDetail({ inspection }) {
+import { useState } from 'react'
+
+export default function InspectionDetail({ inspection, onSearchOsha }) {
+  const [completedActions, setCompletedActions] = useState(new Set())
+
+  const toggleAction = (index) => {
+    setCompletedActions(prev => {
+      const next = new Set(prev)
+      if (next.has(index)) next.delete(index)
+      else next.add(index)
+      return next
+    })
+  }
+
   const severityConfig = {
     critical: { 
       bg: 'bg-red-50', 
@@ -93,9 +106,16 @@ export default function InspectionDetail({ inspection }) {
                     <div className="flex-1 min-w-0">
                       <p className="text-interface-text text-sm">{finding.description}</p>
                       {finding.osha_ref && (
-                        <p className="text-interface-text-muted text-xs mt-1 font-mono">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onSearchOsha?.(finding.osha_ref) }}
+                          className="inline-flex items-center gap-1 mt-1 px-1.5 py-0.5 text-xs font-mono rounded bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 transition-colors"
+                          title={`Search all inspections for OSHA ${finding.osha_ref}`}
+                        >
                           OSHA {finding.osha_ref}
-                        </p>
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                          </svg>
+                        </button>
                       )}
                     </div>
                   </div>
@@ -116,21 +136,45 @@ export default function InspectionDetail({ inspection }) {
       {/* Corrective Actions */}
       {inspection.corrective_actions && inspection.corrective_actions.length > 0 && (
         <div className="mt-5">
-          <span className="text-xs text-interface-text-muted uppercase tracking-wide">Corrective Actions</span>
+          <span className="text-xs text-interface-text-muted uppercase tracking-wide">
+            Corrective Actions
+            <span className="ml-2 normal-case tracking-normal text-interface-text-secondary">
+              ({completedActions.size}/{inspection.corrective_actions.length} complete)
+            </span>
+          </span>
           <div className="mt-2 space-y-2">
-            {inspection.corrective_actions.map((action, index) => (
-              <div key={index} className="bg-white border border-interface-border rounded-lg p-4 flex items-start gap-3">
-                <span className="mt-0.5 w-5 h-5 rounded border-2 border-gray-300 flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-interface-text text-sm">{action.action}</p>
-                  {action.deadline && (
-                    <p className="text-interface-text-muted text-xs mt-1">
-                      Deadline: {action.deadline}
+            {inspection.corrective_actions.map((action, index) => {
+              const done = completedActions.has(index)
+              return (
+                <button
+                  key={index}
+                  onClick={(e) => { e.stopPropagation(); toggleAction(index) }}
+                  className={`w-full text-left bg-white border rounded-lg p-4 flex items-start gap-3 transition-colors ${
+                    done ? 'border-emerald-200 bg-emerald-50/30' : 'border-interface-border'
+                  }`}
+                >
+                  <span className={`mt-0.5 w-5 h-5 rounded border-2 flex-shrink-0 flex items-center justify-center transition-colors ${
+                    done ? 'border-emerald-500 bg-emerald-500' : 'border-gray-300'
+                  }`}>
+                    {done && (
+                      <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm ${done ? 'text-interface-text-muted line-through' : 'text-interface-text'}`}>
+                      {action.action}
                     </p>
-                  )}
-                </div>
-              </div>
-            ))}
+                    {action.deadline && (
+                      <p className="text-interface-text-muted text-xs mt-1">
+                        Deadline: {action.deadline}
+                      </p>
+                    )}
+                  </div>
+                </button>
+              )
+            })}
           </div>
         </div>
       )}

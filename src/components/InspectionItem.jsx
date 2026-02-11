@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import InspectionDetail from './InspectionDetail'
 
-export default function InspectionItem({ inspection }) {
+export default function InspectionItem({ inspection, onSearchOsha }) {
   const [isExpanded, setIsExpanded] = useState(false)
 
   const statusConfig = {
@@ -28,6 +28,12 @@ export default function InspectionItem({ inspection }) {
   }
 
   const status = statusConfig[inspection.status] || statusConfig.open
+
+  const isOverdue = inspection.next_inspection_due && 
+    new Date(inspection.next_inspection_due) < new Date()
+
+  const isIncomplete = inspection.completeness && 
+    !inspection.completeness.is_complete
 
   const formatDate = (dateString) => {
     const [year, month, day] = dateString.split('-').map(Number)
@@ -71,14 +77,24 @@ export default function InspectionItem({ inspection }) {
             {formatDate(inspection.date)}
           </div>
           
-          {/* Findings Count */}
-          {inspection.findings && inspection.findings.length > 0 && (
-            <div className="hidden lg:flex items-center gap-1.5 text-interface-text-muted text-xs">
-              <span className="px-2 py-0.5 bg-gray-100 rounded text-gray-600">
+          {/* Badges */}
+          <div className="hidden lg:flex items-center gap-1.5">
+            {inspection.findings && inspection.findings.length > 0 && (
+              <span className="px-2 py-0.5 bg-gray-100 rounded text-gray-600 text-xs">
                 {inspection.findings.length} finding{inspection.findings.length !== 1 ? 's' : ''}
               </span>
-            </div>
-          )}
+            )}
+            {isOverdue && (
+              <span className="px-2 py-0.5 bg-red-50 rounded text-red-700 text-xs font-medium">
+                Overdue
+              </span>
+            )}
+            {isIncomplete && (
+              <span className="px-2 py-0.5 bg-amber-50 rounded text-amber-700 text-xs font-medium">
+                Incomplete
+              </span>
+            )}
+          </div>
         </div>
         
         {/* Expand Icon */}
@@ -94,7 +110,7 @@ export default function InspectionItem({ inspection }) {
       
       {/* Expanded Detail */}
       {isExpanded && (
-        <InspectionDetail inspection={inspection} />
+        <InspectionDetail inspection={inspection} onSearchOsha={onSearchOsha} />
       )}
     </div>
   )

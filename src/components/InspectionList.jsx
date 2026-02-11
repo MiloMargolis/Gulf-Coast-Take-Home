@@ -1,6 +1,6 @@
 import InspectionItem from './InspectionItem'
 
-export default function InspectionList({ inspections }) {
+export default function InspectionList({ inspections, onSearchOsha }) {
   if (inspections.length === 0) {
     return (
       <div className="bg-white border border-interface-border rounded-lg p-12 text-center">
@@ -16,7 +16,7 @@ export default function InspectionList({ inspections }) {
   return (
     <div className="space-y-2">
       {inspections.map(inspection => (
-        <InspectionItem key={inspection.id} inspection={inspection} />
+        <InspectionItem key={inspection.id} inspection={inspection} onSearchOsha={onSearchOsha} />
       ))}
     </div>
   )

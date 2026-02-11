@@ -1,18 +1,21 @@
 import { useState, useEffect } from 'react'
 import InspectionList from './components/InspectionList'
+import PlatformTimeline from './components/PlatformTimeline'
 import SearchBar from './components/SearchBar'
 import FilterToggle from './components/FilterToggle'
 import UploadButton from './components/UploadButton'
 import ReviewModal from './components/ReviewModal'
+import { exportToCSV } from './utils/exportInspections'
 import inspectionData from '../data/gulf_coast_inspections.json'
 
 function App() {
   const [inspections, setInspections] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
-  const [showFailedOnly, setShowFailedOnly] = useState(false)
+  const [statusFilter, setStatusFilter] = useState('all')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const [pendingInspection, setPendingInspection] = useState(null)
+  const [viewMode, setViewMode] = useState('list') // 'list' or 'platform'
 
   useEffect(() => {
     const saved = localStorage.getItem('uploadedInspections')
@@ -44,15 +47,19 @@ function App() {
 
   const filteredInspections = inspections
     .filter(inspection => {
-      if (showFailedOnly && inspection.status !== 'fail') {
+      if (statusFilter !== 'all' && inspection.status !== statusFilter) {
         return false
       }
       if (searchQuery) {
         const query = searchQuery.toLowerCase()
-        return (
+        const matchesBasic = (
           inspection.location.toLowerCase().includes(query) ||
           inspection.type.toLowerCase().includes(query)
         )
+        const matchesOsha = inspection.findings?.some(f => 
+          f.osha_ref && f.osha_ref.toLowerCase().includes(query)
+        )
+        return matchesBasic || matchesOsha
       }
       return true
     })
@@ -94,11 +101,22 @@ function App() {
               View and manage platform inspection documentation
             </p>
           </div>
-          <UploadButton 
-            onUpload={handleExtracted}
-            setIsLoading={setIsLoading}
-            setError={setError}
-          />
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => exportToCSV(filteredInspections)}
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-interface-text-secondary border border-interface-border rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Export CSV
+            </button>
+            <UploadButton 
+              onUpload={handleExtracted}
+              setIsLoading={setIsLoading}
+              setError={setError}
+            />
+          </div>
         </div>
 
         {/* Controls */}
@@ -107,9 +125,33 @@ function App() {
             <SearchBar value={searchQuery} onChange={setSearchQuery} />
           </div>
           <FilterToggle 
-            checked={showFailedOnly} 
-            onChange={setShowFailedOnly} 
+            value={statusFilter} 
+            onChange={setStatusFilter} 
           />
+          <div className="flex bg-white border border-interface-border rounded-lg overflow-hidden">
+            <button
+              onClick={() => setViewMode('list')}
+              className={`px-3 py-2 text-sm transition-colors ${
+                viewMode === 'list' ? 'bg-blue-50 text-blue-700 font-medium' : 'text-interface-text-secondary hover:bg-gray-50'
+              }`}
+              title="List view"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <button
+              onClick={() => setViewMode('platform')}
+              className={`px-3 py-2 text-sm transition-colors border-l border-interface-border ${
+                viewMode === 'platform' ? 'bg-blue-50 text-blue-700 font-medium' : 'text-interface-text-secondary hover:bg-gray-50'
+              }`}
+              title="Platform view"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Error State */}
@@ -147,12 +189,16 @@ function App() {
         {/* Results Count */}
         <div className="mb-4 text-sm text-interface-text-secondary">
           Showing {filteredInspections.length} of {inspections.length} inspections
-          {showFailedOnly && ' (failed only)'}
+          {statusFilter !== 'all' && ` (${statusFilter.replace('_', ' ')})`}
           {searchQuery && ` matching "${searchQuery}"`}
         </div>
 
-        {/* Inspection List */}
-        <InspectionList inspections={filteredInspections} />
+        {/* Inspection List / Platform View */}
+        {viewMode === 'list' ? (
+          <InspectionList inspections={filteredInspections} onSearchOsha={setSearchQuery} />
+        ) : (
+          <PlatformTimeline inspections={filteredInspections} onSearchOsha={setSearchQuery} />
+        )}
       </main>
 
       {/* Review Modal */}

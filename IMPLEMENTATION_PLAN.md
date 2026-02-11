@@ -74,49 +74,49 @@ This document outlines every bug fix, quality improvement, and above-and-beyond 
 
 ### 3.1 Overdue Inspection Alerts
 
-- [ ] **Extract and display "next scheduled inspection" dates**
+- [x] **Extract and display "next scheduled inspection" dates**
 - **Why it matters:** The Structural Inspection Report says "Next scheduled inspection: March 2024." It's now January 2025 and that inspection never happened — directly leading to the contractor falling through corroded grating. This is THE central failure in the scenario.
 - **Solution:** Add `next_inspection_due` to the extraction schema. Display overdue items with a red warning badge. Show days overdue.
 - **Files:** `extractInspection.js`, `InspectionItem.jsx`, `InspectionDetail.jsx`
 
 ### 3.2 Corrective Action Tracking
 
-- [ ] **Extract corrective actions as trackable items with due dates**
+- [x] **Extract corrective actions as trackable items with due dates**
 - **Why it matters:** The structural inspection requires "Apply corrosion inhibitor to sections G-47, G-48 within 30 days." Tracking whether this actually happened is exactly what Raquel needs.
 - **Solution:** Extract `corrective_actions: [{ action, deadline, status }]` from documents. Display them in the detail view with visual status (overdue/pending/done).
 - **Files:** `extractInspection.js`, `InspectionDetail.jsx`
 
 ### 3.3 Document Completeness Flags
 
-- [ ] **Flag incomplete documents on upload**
+- [x] **Flag incomplete documents on upload**
 - **Why it matters:** The Contractor Safety Orientation Certificate is incomplete — fall protection module unchecked (in red), supervisor signature blank, handwritten note saying "ran out of time." OSHA specifically requested this documentation.
 - **Solution:** Have the LLM return a `completeness` object: `{ is_complete, missing_items: [] }`. Show a prominent warning banner on incomplete documents.
 - **Files:** `extractInspection.js`, `InspectionDetail.jsx`
 
 ### 3.4 "Pass with Conditions" as First-Class Status
 
-- [ ] **Add fourth status type with distinct styling**
+- [x] **Add fourth status type with distinct styling**
 - **Why it matters:** Real industrial inspections aren't binary. Supporting this shows domain understanding and fixes bug 1.3 properly.
 - **Solution:** Add `pass_with_conditions` to status config with a distinct teal/yellow-green badge. Update filter to optionally include conditional passes.
 - **Files:** `InspectionItem.jsx`, `FilterToggle.jsx`
 
 ### 3.5 Platform Timeline View
 
-- [ ] **Add per-platform inspection history**
+- [x] **Add per-platform inspection history**
 - **Why it matters:** Platform 7 has a 2023 inspection noting corrosion → a Dec 2024 "pass" → a Jan 2025 incident. Seeing this timeline in one place would have caught the gap immediately. Raquel wouldn't be up until 2am connecting dots across binders and shared drives.
 - **Solution:** Add a "View by Platform" toggle that groups inspections by location and shows them as a timeline. Highlight gaps where scheduled inspections were missed.
 - **Files:** New component `PlatformTimeline.jsx`, `App.jsx`
 
 ### 3.6 OSHA Reference Cross-Linking
 
-- [ ] **Make OSHA references searchable/filterable**
+- [x] **Make OSHA references searchable/filterable**
 - **Why it matters:** OSHA Region 6 is actively investigating. Being able to pull "all findings citing 1910.22(b) across all facilities" is exactly what an HSE director needs during an investigation.
 - **Solution:** Make OSHA reference badges clickable — clicking one filters the list to all inspections with findings citing that standard.
 - **Files:** `InspectionDetail.jsx`, `App.jsx`
 
 ### 3.7 Export / OSHA Response Package
 
-- [ ] **Add export functionality for filtered inspections**
+- [x] **Add export functionality for filtered inspections**
 - **Why it matters:** Raquel's entire crisis is about pulling records together. An "Export" button that generates a CSV or printable summary of the currently filtered/visible inspections directly solves her problem.
 - **Solution:** Add an "Export" button next to the upload button. Exports the current filtered view as CSV (inspection data + findings).
 - **Files:** New utility `exportInspections.js`, `App.jsx`
