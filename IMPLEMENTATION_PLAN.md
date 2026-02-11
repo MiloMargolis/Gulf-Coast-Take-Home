@@ -52,19 +52,19 @@ This document outlines every bug fix, quality improvement, and above-and-beyond 
 
 ### 2.1 Post-Extraction Review UI
 
-- [ ] **Add review/edit step before saving extracted inspection**
+- [x] **Add review/edit step before saving extracted inspection**
 - **Problem:** Extracted data goes straight into the list with no chance to verify or correct. For safety-critical OSHA data, this is unacceptable.
 - **Solution:** After LLM extraction, show a modal/panel with the extracted fields alongside the raw document text. User can edit any field before confirming. This directly addresses every extraction bug — even if the LLM gets it wrong, the user catches it.
 
 ### 2.2 Extraction Confidence Indicators
 
-- [ ] **Flag inferred vs. explicit fields**
+- [x] **Flag inferred vs. explicit fields**
 - **Problem:** The user can't tell which fields came directly from the document vs. which the LLM guessed.
 - **Solution:** Ask the LLM to return a `confidence` object alongside the data, or flag fields like severity/status that were inferred. Display these with a subtle indicator in the review UI.
 
 ### 2.3 Persist Uploaded Inspections
 
-- [ ] **Save uploaded inspections to localStorage**
+- [x] **Save uploaded inspections to localStorage**
 - **Problem:** Uploaded inspections vanish on page refresh.
 - **Solution:** Sync the inspections array to `localStorage`. On load, merge saved uploads with the base JSON data. Simple, no backend needed.
 

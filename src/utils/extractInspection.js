@@ -95,12 +95,19 @@ Return this exact JSON structure:
   "completeness": {
     "is_complete": true,
     "missing_items": ["list of any missing signatures, unchecked required modules, incomplete sections, etc."]
+  },
+  "confidence": {
+    "id": "found | generated",
+    "status": "explicit | inferred",
+    "severity": "explicit | inferred",
+    "date": "explicit | inferred"
   }
 }
 
 - corrective_actions: Extract from any "Corrective Actions Required" or similar sections. Empty array [] if none.
 - next_inspection_due: Extract if the document states a next scheduled inspection date. null if not mentioned.
 - completeness: Flag if signatures are missing, required fields are blank, modules are unchecked, or handwritten notes indicate incomplete items.
+- confidence: For each field, indicate whether the value was explicitly stated in the document ("found"/"explicit") or inferred by you ("generated"/"inferred"). This helps users know which fields to double-check.
 - findings array should be empty [] only if there are truly no findings in the entire document.
 - Always return valid JSON only, no other text.`
 

@@ -3,6 +3,7 @@ import InspectionList from './components/InspectionList'
 import SearchBar from './components/SearchBar'
 import FilterToggle from './components/FilterToggle'
 import UploadButton from './components/UploadButton'
+import ReviewModal from './components/ReviewModal'
 import inspectionData from '../data/gulf_coast_inspections.json'
 
 function App() {
@@ -11,13 +12,34 @@ function App() {
   const [showFailedOnly, setShowFailedOnly] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [pendingInspection, setPendingInspection] = useState(null)
 
   useEffect(() => {
-    setInspections(inspectionData.inspections)
+    const saved = localStorage.getItem('uploadedInspections')
+    const uploaded = saved ? JSON.parse(saved) : []
+    setInspections([...uploaded, ...inspectionData.inspections])
   }, [])
 
-  const handleNewInspection = (newInspection) => {
-    setInspections(prev => [newInspection, ...prev])
+  const persistUploaded = (allInspections) => {
+    // Only persist inspections that aren't in the base JSON data
+    const baseIds = new Set(inspectionData.inspections.map(i => i.id))
+    const uploaded = allInspections.filter(i => !baseIds.has(i.id))
+    localStorage.setItem('uploadedInspections', JSON.stringify(uploaded))
+  }
+
+  const handleExtracted = (extracted) => {
+    setPendingInspection(extracted)
+  }
+
+  const handleConfirmInspection = (reviewed) => {
+    const updated = [reviewed, ...inspections]
+    setInspections(updated)
+    persistUploaded(updated)
+    setPendingInspection(null)
+  }
+
+  const handleCancelReview = () => {
+    setPendingInspection(null)
   }
 
   const filteredInspections = inspections
@@ -73,7 +95,7 @@ function App() {
             </p>
           </div>
           <UploadButton 
-            onUpload={handleNewInspection}
+            onUpload={handleExtracted}
             setIsLoading={setIsLoading}
             setError={setError}
           />
@@ -132,6 +154,15 @@ function App() {
         {/* Inspection List */}
         <InspectionList inspections={filteredInspections} />
       </main>
+
+      {/* Review Modal */}
+      {pendingInspection && (
+        <ReviewModal
+          inspection={pendingInspection}
+          onConfirm={handleConfirmInspection}
+          onCancel={handleCancelReview}
+        />
+      )}
     </div>
   )
 }
