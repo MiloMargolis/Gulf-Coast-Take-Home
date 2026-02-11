@@ -8,7 +8,7 @@ This document outlines every bug fix, quality improvement, and above-and-beyond 
 
 ### 1.1 Date Off By One (March 15 → March 14)
 
-- [ ] **Fix date timezone bug**
+- [x] **Fix date timezone bug**
 - **Problem:** Document says "March 15, 2023" but the app displays "March 14, 2023"
 - **Root Cause:** `new Date("2023-03-15")` parses as UTC midnight. `toLocaleDateString()` then converts to the user's local timezone (US Central/Eastern), shifting it back one day.
 - **Files:** `InspectionItem.jsx` (line 27-33), `InspectionDetail.jsx` (line 21-28)
@@ -16,7 +16,7 @@ This document outlines every bug fix, quality improvement, and above-and-beyond 
 
 ### 1.2 Report ID Ignored (SI-2023-047 → INS-2023-001)
 
-- [ ] **Fix ID extraction in LLM prompt**
+- [x] **Fix ID extraction in LLM prompt**
 - **Problem:** The document contains Report ID `SI-2023-047`, but the LLM generates `INS-2023-001` instead.
 - **Root Cause:** The prompt says `"generate one like INS-YYYY-XXX if not found"`, which biases the LLM to always generate an INS-prefixed ID instead of using the document's actual ID.
 - **File:** `extractInspection.js` (line 47)
@@ -24,7 +24,7 @@ This document outlines every bug fix, quality improvement, and above-and-beyond 
 
 ### 1.3 Status Mismatch (PASS with conditions → Open)
 
-- [ ] **Handle "pass with conditions" status**
+- [x] **Handle "pass with conditions" status**
 - **Problem:** Document says "PASS with conditions" but the app shows "Open."
 - **Root Cause:** The prompt constrains status to only `"pass, fail, or open"`. The LLM can't represent a conditional pass, so it guesses "open."
 - **File:** `extractInspection.js` (line 52), `InspectionItem.jsx` (statusConfig)
@@ -32,7 +32,7 @@ This document outlines every bug fix, quality improvement, and above-and-beyond 
 
 ### 1.4 Ambiguous Severity Levels
 
-- [ ] **Add severity extraction heuristics to prompt**
+- [x] **Add severity extraction heuristics to prompt**
 - **Problem:** The structural inspection report doesn't have explicit severity labels. The LLM guesses inconsistently.
 - **Root Cause:** No guidance in the prompt for how to infer severity from inspection language.
 - **File:** `extractInspection.js` (system prompt)
@@ -40,7 +40,7 @@ This document outlines every bug fix, quality improvement, and above-and-beyond 
 
 ### 1.5 Missing Zone C Data & Corrective Actions
 
-- [ ] **Expand extraction schema for full document coverage**
+- [x] **Expand extraction schema for full document coverage**
 - **Problem:** Zone C (Helideck Access) findings and the "Corrective Actions Required" section are completely missing from the extracted output.
 - **Root Cause:** The JSON schema in the prompt has no fields for corrective actions or section-level detail. The LLM drops data that doesn't fit the schema.
 - **File:** `extractInspection.js` (system prompt schema)

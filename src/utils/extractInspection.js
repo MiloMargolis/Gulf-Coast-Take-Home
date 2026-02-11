@@ -40,32 +40,69 @@ async function extractWithLLM(documentText) {
   console.log(`      Model: gpt-4o-mini`)
   console.log(`      API Key: ${OPENAI_API_KEY.substring(0, 7)}...${OPENAI_API_KEY.substring(OPENAI_API_KEY.length - 4)}`)
 
-  const systemPrompt = `You are an expert at extracting structured data from offshore platform inspection documents. 
-Extract the following information from the document and return it as valid JSON:
+  const systemPrompt = `You are an expert at extracting structured data from offshore platform inspection documents.
+Extract the following information from the document and return it as valid JSON.
+
+CRITICAL RULES:
+- Use EXACTLY what the document says. Do not paraphrase, round, or reformat values unless instructed.
+- For "id": Use the document's Report ID, Inspection ID, Certificate ID, or any identifier EXACTLY as written (e.g., "SI-2023-047", "GC-HSE-101"). Only generate an ID like "INS-YYYY-XXX" if absolutely no identifier exists in the document.
+- For "date": Use the inspection/report date from the document. Format as YYYY-MM-DD. Do NOT shift or adjust the date.
+- For "status": Use one of: "pass", "fail", "open", or "pass_with_conditions". 
+  - "pass" = no issues found
+  - "fail" = significant findings requiring action
+  - "pass_with_conditions" = passed overall but with noted conditions, recommendations, or required follow-ups
+  - "open" = investigation ongoing or unresolved
+  - Use the document's stated status. If it says "PASS with conditions", use "pass_with_conditions".
+- For "inspector": Use the full name and title if provided (e.g., "Dave Landry, Senior Structural Engineer").
+
+SEVERITY HEURISTICS (when the document does not explicitly label severity):
+- critical: Immediate safety risk, expired permits during active work, structural failure risk
+- high: Overdue maintenance on safety equipment, missing required documentation, corrosion requiring replacement
+- medium: Surface rust, minor corrosion to monitor, missing training refreshers, PPE violations
+- low: Housekeeping items, informational recommendations, items addressed on-site
+
+FINDINGS RULES:
+- Capture ALL findings from ALL sections/zones in the document. Do not skip any.
+- Each distinct finding should be its own entry, even if they're in the same zone/section.
+- Include the zone/section context in the description (e.g., "Zone A (Production Deck): Surface rust on sections G-14 through G-22").
+- If a zone has no issues, include it as a finding with severity "low" and note "no action required".
+
+Return this exact JSON structure:
 
 {
-  "id": "unique inspection ID (generate one like INS-YYYY-XXX if not found)",
+  "id": "document's own ID, verbatim",
   "location": "platform or facility name",
-  "type": "type of inspection (e.g., Structural Inspection, Safety Orientation, PSM Audit, etc.)",
-  "date": "date in YYYY-MM-DD format",
-  "inspector": "name of inspector or organization",
-  "status": "pass, fail, or open",
-  "summary": "brief 1-2 sentence summary of the inspection",
+  "type": "type of inspection as stated in document",
+  "date": "YYYY-MM-DD",
+  "inspector": "full name and title",
+  "status": "pass | fail | open | pass_with_conditions",
+  "summary": "brief 1-2 sentence summary",
   "findings": [
     {
-      "severity": "critical, high, medium, or low",
-      "description": "description of the finding",
+      "severity": "critical | high | medium | low",
+      "description": "description including zone/section context",
       "osha_ref": "OSHA reference if applicable, otherwise null"
     }
-  ]
+  ],
+  "corrective_actions": [
+    {
+      "action": "what needs to be done",
+      "deadline": "stated deadline or null",
+      "status": "pending"
+    }
+  ],
+  "next_inspection_due": "YYYY-MM-DD or null if not stated",
+  "completeness": {
+    "is_complete": true,
+    "missing_items": ["list of any missing signatures, unchecked required modules, incomplete sections, etc."]
+  }
 }
 
-Important:
-- If status is not explicitly stated, infer from findings (no findings = pass, findings = fail or open)
-- For safety orientation certificates, status is typically "pass" if completed
-- Generate a realistic inspection ID if one is not provided
-- findings array should be empty [] if there are no issues
-- Always return valid JSON only, no other text`
+- corrective_actions: Extract from any "Corrective Actions Required" or similar sections. Empty array [] if none.
+- next_inspection_due: Extract if the document states a next scheduled inspection date. null if not mentioned.
+- completeness: Flag if signatures are missing, required fields are blank, modules are unchecked, or handwritten notes indicate incomplete items.
+- findings array should be empty [] only if there are truly no findings in the entire document.
+- Always return valid JSON only, no other text.`
 
   const startTime = performance.now()
 
@@ -121,9 +158,24 @@ Important:
       throw new Error('Missing required fields in extracted data')
     }
 
-    // Ensure findings is an array
+    // Normalize status
+    const validStatuses = ['pass', 'fail', 'open', 'pass_with_conditions']
+    if (!validStatuses.includes(inspection.status)) {
+      console.warn(`[WARN] Unknown status "${inspection.status}", defaulting to "open"`)
+      inspection.status = 'open'
+    }
+
+    // Ensure arrays exist
     if (!Array.isArray(inspection.findings)) {
       inspection.findings = []
+    }
+    if (!Array.isArray(inspection.corrective_actions)) {
+      inspection.corrective_actions = []
+    }
+
+    // Ensure completeness object exists
+    if (!inspection.completeness) {
+      inspection.completeness = { is_complete: true, missing_items: [] }
     }
 
     return inspection

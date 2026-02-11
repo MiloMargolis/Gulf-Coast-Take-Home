@@ -10,6 +10,11 @@ export default function InspectionItem({ inspection }) {
       text: 'text-emerald-700',
       label: 'Pass' 
     },
+    pass_with_conditions: { 
+      bg: 'bg-teal-50', 
+      text: 'text-teal-700',
+      label: 'Conditional' 
+    },
     fail: { 
       bg: 'bg-red-50', 
       text: 'text-red-700',
@@ -25,7 +30,8 @@ export default function InspectionItem({ inspection }) {
   const status = statusConfig[inspection.status] || statusConfig.open
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString)
+    const [year, month, day] = dateString.split('-').map(Number)
+    const date = new Date(year, month - 1, day)
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
